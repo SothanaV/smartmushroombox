@@ -1,0 +1,45 @@
+<html>
+<body>
+<h1><font color="orange"> SmartMushroomBox </font></h1>
+<h1><font color="red"> SET Temperature_:  </font>
+<input type="range" min="0.00" max="100.00" value=targetT  oninput="showValueT(this.value)" />
+<span id="range">0</span>
+<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+<script type="text/javascript" charset="utf-8">
+var socket = io();
+socket.on('s2c_targetT',targetT)
+targetT=value
+function showValueT(newValueT)
+{
+	document.getElementById("range").innerHTML=newValueT;
+	socket.emit('c2sT',  newValueT);
+	//socket.emit('s2c', { for: 'everyone' });
+}
+</script>
+<h1><font color="blue"> SET Humidity____: </font>
+<input type="range" min="0" max="100" value=targetH  oninput="showValueH(this.value)" />
+<span id="range2">0</span>
+<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+<script type="text/javascript" charset="utf-8">
+socket.on('s2c_targetH',targetH)
+targetH = value
+function showValueH(newValueH)
+{
+	document.getElementById("range2").innerHTML=newValueH;
+	socket.emit('c2sH',  newValueH);
+	//socket.emit('s2c', { for: 'everyone' });
+}
+</script>
+<script type="text/javascript">
+	socket.on('s2cT' ,function(msg)
+	{
+  
+	}
+
+</script>
+</body>
+	<h1><font color="white"> . </font></h1>
+	<h1><font color="white"> . </font></h1>
+	<h5><a href="http://localhost:5000/sliderbarTemp" >Click here!To ControlTemperature</a></h5>
+	<h5><a href="http://localhost:5000/sliderbarHumi" >Click here!To ControlHumidity </a></h5>
+</html>

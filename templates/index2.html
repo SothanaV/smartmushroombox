@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="morris.css">
+    <script src="raphael.min.js"></script>
+    <script src="morris.min.js"></script>
+    <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <style>
+    #mylist { list-style-type: none; margin: 0; padding: 0; }
+      #mylist li { padding: 5px 10px; }
+      #mylist li:nth-child(odd) { background: #99f; }
+    </style>
+  </head>
+  <body>
+    <h2>Hello, {{name}}</h2>
+    <h3>Message:{{message}}</h3>
+    <div id="myfirstchart" style="height: 250px;"></div>
+    element: 'myfirstchart',
+    <ul id="mylist"></ul>
+    <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+
+    <script>
+      var socket = io();
+      var socket = io.connect('http://172.20.10.11:5000');
+      new Morris.Area({
+        data: [
+    { year: '2015-01', value1: 3.01,value2: 1.36},
+    ],
+    // The name of the data record attribute that contains x-values.
+    xkey: 'time',
+    // A list of names of data record attributes that contain y-values.
+    ykeys: ['temp','humi'],
+    // Labels for the ykeys -- will be displayed when you hover over the
+    // chart.
+    labels: ['temp','humi']
+    });
+    // ID of the element in which to draw the chart.
+      socket.on('s2c', function(msg)
+      {
+        console.log(msg)
+        $('#mylist').append($('<li>').text(msg));
+      });
+    </script>
+  </body>
+</html>
