@@ -19,25 +19,28 @@ Red = 0
 Green = 0
 Blue = 0
 lastOffCooler = datetime.now()
+lastlighton = datetime.now()
+lastlightoff = datetime.now()
 lastSW=''
+lastlight=0
 io = StringIO()
 stateT = 0
 stateH = 0
-#Get data From Browser
-@socketio.on('c2s')
+#Get data From Browser	
+@socketio.on('c2s')																				#listen Data From Browser parth socketio "c2s" = cilent to server 
 def C2S(data):
 	global targetT
 	global targetH
 	global Red
 	global Green
 	global Blue
-	sdata=json.loads(data)
-	targetT = float(sdata['T'])
+	sdata=json.loads(data)																		#get DAta By JsonFile
+	targetT = float(sdata['T'])																	#sprit data 															
 	targetH = float(sdata['H'])
 	Red = float(sdata['R'])
 	Green = float(sdata['G'])
 	Blue = float(sdata['B'])
-	print "TARGET_T : %s"%(targetT)
+	print "TARGET_T : %s"%(targetT)																#print data
 	print "TARGET_H : %s"%(targetH)
 	print "Red%03d,Green%03d,Blue%03d"%(Red,Green,Blue)
 
@@ -55,7 +58,7 @@ def alarm(t,h):
 	global Green
 	global Blue
 	global stateT,stateH 
-	log= str(datetime.now()) + "::temperature: %s *c,humidity: %s percent"%(t,h)
+	log= str(datetime.now()) + "||Temperature: %s *c Humidity: %s percent"%(t,h)
 	print log
 	#logT = "Temperature: %s"%(t)
 	#logH = "Humidity   : %s"%(h)
@@ -67,7 +70,8 @@ def alarm(t,h):
 	stateH = h
 	write_file()
 	writeDB()
-	#SocketIO.emit('s2c',Red)
+	onoff()
+	socketio.emit('s2c',log)
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
 	
 def write_file():
@@ -95,6 +99,7 @@ def SWcontrolT(StateT):
 		else:
 			switchT="100"
 			print "OffCooler"
+	socketio.emit('s2cC',switchT)
 	if(lastSW=="101" and switchT=="100"):
 		lastOffCooler = datetime.now()
 	lastSW=switchT
@@ -114,8 +119,33 @@ def SWcontrolH(StateH):
 		else:
 			switchH="200"
 			print "OffPump"
-
+	socketio.emit('s2cP',switchH)		
 	return switchH
+def  onoff():
+	print "onOff"
+	print "last ON%s"%lastlighton
+	print "last OFF%s"%lastlightoff
+	global Red
+	global Green
+	global Blue
+	global lastlighton
+	global lastlightoff
+	global lastlight
+	if( datetime.now()<(lastlighton+timedelta(seconds=10)) and lastlightoff>lastlighton ):
+	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
+		Red = 255
+		Green = 0
+		Blue = 255
+	else:
+		Red = 0
+		Green = 0
+		Blue = 0
+		lastlightoff = datetime.now()-timedelta(seconds=10)
+	if(lastlight==255 and Red==0):
+		lastlighton = datetime.now()
+		print "UPDATETIMES"
+	lastlight = Red
+	return Red , Green ,Blue
 	
 @app.route("/sliderbarTemp")
 def sliderbarTemp():
@@ -160,7 +190,9 @@ def TEST2():
 		data.append(d)
 
 	return jsonify(data)
-
+@app.route("/view")
+def view():
+	return render_template('status.html')
 def writeDB():
 	global stateT,stateH,targetT,targetH,Red,Green,Blue
 	db=sqlite3.connect('mydb.sqlite')
@@ -175,27 +207,8 @@ def writeDB():
 	
 	return "y: %s"%y
 
-#@app.teardown_appcontext
-#def close_connection(exception):
-#    db = getattr(g, '_database', None)
-#    if db is not None:
-#        db.close()
-
-
 if __name__ == "__main__":
     #app.run(host='0.0.0.0',port=4999,debug=True)
     socketio.run(app)
-#def writefile():
-#	global targetT ,targetH ,StateT ,stateH ,Red ,Green ,Blue
-#	file = open("DATA.txt", "w")
-#	file.write(targetT)
-#	file.write(targetH)
-#	file.write(stateT)
-#	file.write(stateH)
-#	file.write(Red)
-#	file.write(Green)
-#	file.write(Blue)
-#	file.close()
-#	file = open('DATA', 'r')
-#	print file.read()
+
 
