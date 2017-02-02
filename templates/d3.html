@@ -78,18 +78,20 @@ for(var i=0;i<100;i++){
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom,
+    min_temp=10,max_temp=40,
+    min_hum=0,max_hum=100;
 
 var x = d3.scale.linear()
 //    .domain([-width / 2, width / 2])
 //    .range([0, width]);
-    .domain([10, 30])
+    .domain([min_temp, max_temp])
     .range([0, width]);
 
 var y = d3.scale.linear()
 //    .domain([-height / 2, height / 2])
 //    .range([height, 0]);
-    .domain([20, 40])
+    .domain([max_hum, min_hum])
     .range([0, height]);
 
 var xAxis = d3.svg.axis()
@@ -196,8 +198,8 @@ function zoomed() {
 
 function reset() {
   d3.transition().duration(750).tween("zoom", function() {
-    var ix = d3.interpolate(x.domain(), [10, 30]),
-        iy = d3.interpolate(y.domain(), [20, 40]);
+    var ix = d3.interpolate(x.domain(), [min_temp, max_temp]),
+        iy = d3.interpolate(y.domain(), [max_hum, min_hum]);
     return function(t) {
       zoom.x(x.domain(ix(t))).y(y.domain(iy(t)));
       zoomed();
