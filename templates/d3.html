@@ -64,7 +64,7 @@ socket.on('s2cS',function(Rdata)
 // 	my=humi
 // });
 var data=[];
-for(var i=0;i<100;i++){
+for(var i=0;i<500;i++){
 	data.push([0,0]);
 }
 
@@ -150,7 +150,7 @@ function draw(){
 	circles
 		.transition().duration(1000)
 		.attr("fill","#f90")
-		.attr("r",5)
+		.attr("r",2)
 		.attr("fill-opacity", function(d,i) { 
 			return Math.pow(0.95,i); 
 		})
