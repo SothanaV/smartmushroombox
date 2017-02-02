@@ -21,6 +21,7 @@ Blue = 0
 lastOffCooler = datetime.now()
 lastlighton = datetime.now()
 lastlightoff = datetime.now()
+last_writedb=datetime.now()
 lastSW=''
 lastlight=0
 io = StringIO()
@@ -72,7 +73,7 @@ def alarm(t,h):
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
-	#writeDB()
+	writeDB()
 	onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
 	
