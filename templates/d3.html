@@ -5,22 +5,37 @@
  <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
  <style type="text/css">
 			
-			.axis path,
-			.axis line {
-				fill: none;
-				stroke: black;
-				shape-rendering: crispEdges;
-			}
-			
-			.axis text {
-				font-family: sans-serif;
-				font-size: 11px;
-			}
+	body {
+	  position: relative;
+	  width: 960px;
+	}
 
-		</style>		
+	svg {
+	  font: 10px sans-serif;
+	  shape-rendering: crispEdges;
+	}
+
+	rect {
+	  fill: #ddd;
+	}
+
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #fff;
+	}
+
+	button {
+	  position: absolute;
+	  right: 30px;
+	  top: 30px;
+	}
+
+</style>		
 </head>
+
 <body>
-<svg class="chart"></svg>
+<button>Reset</button>
 <script>
 var socket = io();
 var mx,my;
@@ -53,43 +68,87 @@ for(var i=0;i<100;i++){
 	data.push([0,0]);
 }
 
-var width = 1024, height = 720, padding = 100;
-var mychart = d3.select(".chart")
-		.attr("width",width)
-		.attr("height",height)
+
+//var x = d3.scale.linear()
+//    .domain([13, 30])
+//    .range([0, width]);
+//var y = d3.scale.linear()
+//    .domain([15, 70])
+//    .range([0, height]);
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
 var x = d3.scale.linear()
-    .domain([13, 30])
+//    .domain([-width / 2, width / 2])
+//    .range([0, width]);
+    .domain([10, 30])
     .range([0, width]);
+
 var y = d3.scale.linear()
-    .domain([15, 70])
+//    .domain([-height / 2, height / 2])
+//    .range([height, 0]);
+    .domain([20, 40])
     .range([0, height]);
 
-//Create the SVG Viewport
-/*var svgContainer = d3.select("body").append("svg")
-    .attr("width", 1024)
-    .attr("height", 600);
- 
- //Create the Scale we will use for the Axis
- var axisScale = d3.scale.linear()
-    .domain([10, 30])
-    .range([0, 1024]);
-//Create the Axis
 var xAxis = d3.svg.axis()
-    .scale(axisScale);
+    .scale(x)
+    .orient("bottom")
+    .tickSize(-height);
 
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(5)
+    .tickSize(-width);
 
-//Create an SVG group Element for the Axis elements and call the xAxis function
-var xAxisGroup = svgContainer.append("g")
-     .call(xAxis);*/
+var zoom = d3.behavior.zoom()
+    .x(x)
+    .y(y)
+    .scaleExtent([1, 10])
+    .on("zoom", zoomed);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .call(zoom);
+
+svg.append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+d3.select("button").on("click", reset);
+
+svg.append("text")
+	.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+	.attr("transform", "translate("+ -1*margin.right +","+(height/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+	.text("Humidity [%RH]");
+
+svg.append("text")
+	.attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+	.attr("transform", "translate("+ width/2 +","+(height+margin.bottom-5)+")")  // centre below axis
+	.text("Temperature [℃]");
 
 
 function draw(){
-	var circles=mychart.selectAll("circle")
+	var circles=svg.selectAll("circle")
 		.data(data)
 	circles
 		.transition().duration(5000)
 		.attr("fill","#f90")
-		.attr("r",10)
+		.attr("r",5)
 		.attr("fill-opacity", function(d,i) { 
 			return Math.pow(0.95,i); 
 		})
@@ -105,7 +164,45 @@ function draw(){
 	circles.exit().transition().duration(1000)
 		.attr("r",0)
 		.remove();
+}
 
+
+function zoomed() {
+	svg.select(".x.axis").call(xAxis);
+	svg.select(".y.axis").call(yAxis);
+	
+	var circles=svg.selectAll("circle")
+		.data(data)
+	circles
+		.transition().duration(0)
+		.attr("fill","#f90")
+		.attr("r",5)
+		.attr("fill-opacity", function(d,i) { 
+			return Math.pow(0.95,i); 
+		})
+		.attr("cx", function(d,i) { return x(d[0]); })
+		.attr("cy", function(d,i) { return y(d[1]); })
+	circles.enter().append("circle")
+		.transition()
+		.attr("r",0)
+		.attr("cx", function(d,i) { return x(d[0]); })
+		.attr("cy", function(d,i) { return y(d[1]); })
+		.attr("fill","#aa0")
+		
+	circles.exit().transition().duration(0)
+		.attr("r",0)
+		.remove();
+}
+
+function reset() {
+  d3.transition().duration(750).tween("zoom", function() {
+    var ix = d3.interpolate(x.domain(), [10, 30]),
+        iy = d3.interpolate(y.domain(), [20, 40]);
+    return function(t) {
+      zoom.x(x.domain(ix(t))).y(y.domain(iy(t)));
+      zoomed();
+    };
+  });
 }
 </script>
 </body>
