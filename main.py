@@ -73,7 +73,9 @@ def alarm(t,h):
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
-	writeDB()
+	if( datetime.now()<(last_writedb+timedelta(seconds=10))):
+		writeDB()
+		last_writedb=datetime.now()
 	onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
 	
