@@ -1,9 +1,287 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SmartMushroomBox</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='raphael-min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='morris-0.4.1.min.js') }}"></script>
+</head>
 <body>
-	<h1><font color="orange">  Naii Sothana </h1></font>
-	<h2><font color="gray"> My name is sothana vicharueang My nickname is Nai  i'm photographer </font></h2>
-	<p><font color="purple"> Tel 080-526-7718 ID_Line:naii999 </font> </p>
 
-	
+<div class="jumbotron text-center">
+  <h1>SmartMushroomBox</h1>
+  <p><font color="#6b6a6a"> กล่องเห็ดอัจฉริยะ </font></p> 
+</div>
+  
+<div class="container">
+  <div class="row">
+    <div  id="Temp" class="col-sm-4">
+      <h3 style="text-align:center;">TEMPERATURE</h3>
+      <h5 style="text-align:center;"> อุณหภูมิ </h5>
+      <h1 style="text-align:center;" id="temp"> </h1>
+      <!--<button id="B_G_temp" class="btn btn-default" style="text-align:center;"> Hide/Show Graph</button>-->
+      <div id="G_temp"></div>
+      <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+      <script type="text/javascript">
+                  var socket = io();
+              socket.on('s2cT', function(temp)
+              {
+                console.log(temp);
+                document.getElementById("temp").innerHTML=temp+'&#8451';
+              });
+                  $.getJSON( "data.json", function( data ) {
+              data.forEach( function(element,i){
+                data[i].Red=data[i].Red/32;
+              });
+              Morris.Line({
+              element: 'G_temp',
+              data: data,
+              xkey: 'timestamp',
+              ykeys: ['stateT','targetT'],
+              pointSize: 0,
+              ymin: 14,
+              ymax: 23,
+              });
+              });
+
+        $(document).ready(function()
+        {
+          $("#Temp").click(function()
+          {
+          $("#G_temp").slideToggle("slow");
+          });
+        });           
+      </script>
+      <style>
+        #G_temp
+       {
+          display:none;
+          overflow:hidden;
+       }
+      </style>
+    </div>
+    <div id="Humi" class="col-sm-4">
+      <h3 style="text-align:center;">HUMIDITY</h3>
+      <h5 style="text-align:center;"> ความชื้น </h5>
+      <h1 style="text-align:center;" id="humi"> </h1>
+      <div id="G_humi"></div>
+      <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+      <script type="text/javascript">
+                  var socket = io();
+              socket.on('s2cH', function(humi)
+              {
+                console.log(humi);
+                document.getElementById("humi").innerHTML=humi+"%";
+              });
+              $.getJSON( "data.json", function( data ) {
+              data.forEach( function(element,i){
+                data[i].Red=data[i].Red/32;
+              });
+              Morris.Line({
+              element: 'G_humi',
+              data: data,
+              xkey: 'timestamp',
+              ykeys: ['stateH'],
+              pointSize: 0,
+              ymin: 15,
+              ymax: 65
+              });
+              });
+              $(document).ready(function()
+        {
+          $("#Humi").click(function()
+          {
+          $("#G_humi").slideToggle("slow");
+          });
+        });           
+      </script>
+      <style>
+    #G_humi
+    {
+      display:none;
+      overflow:hidden;
+    }
+    </style>
+      <p></p>
+      <p></p>
+    </div>
+    <div id="Light" class="col-sm-4">
+      <h3 style="text-align:center;">LIGHT</h3>
+      <h5 style="text-align:center;"> แสง </h5>
+      <h1 style="text-align:center;" id="light"> </h1>
+      <div id="G_light"></div>
+      <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+      <script type="text/javascript">
+      var socket = io();
+                socket.on('L_status', function(L)
+                {
+                  console.log(L);
+                  document.getElementById("light").innerHTML=L;
+                });
+                $.getJSON( "data.json", function( data ) {
+                data.forEach( function(element,i){
+                  data[i].Red=data[i].Red/255;
+                });
+                Morris.Line({
+                element: 'G_light',
+                data: data,
+                xkey: 'timestamp',
+                ykeys: ['Red'],
+                pointSize: 0
+                });
+                });
+          $(document).ready(function()
+        {
+          $("#Light").click(function()
+          {
+          $("#G_light").slideToggle("slow");
+          });
+        });           
+      </script>
+      <style>
+    #G_light
+    {
+      display:none;
+      overflow:hidden;
+    }
+    </style>
+          
+      <p></p> 
+      <p></p>
+    </div>
+  </div>
+      <div class="col-sm4">
+          <h2 style="text-align:center";><font color="black"> GRAPH </font></h2>
+          <h5 style="text-align:center";> กราฟ </h5>
+          <div id="graph" style="text-align:center";></div>
+            <script type="text/javascript">
+                 $.getJSON( "data.json", function( data ) {
+                  data.forEach( function(element,i){
+                    data[i].Red=data[i].Red/32;
+                  });
+                  Morris.Line({
+                  element: 'graph',
+                  data: data,
+                  xkey: 'timestamp',
+                  ykeys: ['stateT', 'stateH','targetT','Red'],
+                  labels: ['Temperature', 'Humidity','TargetTemperature','Light'],
+                  pointSize: 0
+                });
+                });         
+            </script>
+      </div>
+      <h3 style="text-align:center";> PSYCHROMETRIC CHART </h3>
+      <script src="{{ url_for('static', filename='d3.v3.min.js') }}"></script>
+      <style type="text/css">
+      
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+      
+      .axis text {
+        font-family: sans-serif;
+        font-size: 11px;
+      }
+
+    </style>
+    <svg class="chart"></svg>
+<script>
+var socket = io();
+var mx,my;
+socket.on('s2cS',function(Rdata)
+{
+  console.log(Rdata);
+  //mx=x.invert(d3.mouse(this)[0]);
+  //my=y.invert(d3.mouse(this)[1]);
+  //data.push([mx,my]); //add last
+  mx=Rdata.t;
+  my=Rdata.h;
+  console.log(mx,Rdata.t,my,Rdata.h)
+  data.unshift([mx,my]); //add first
+  //draw();
+  data.pop(); //remove last
+  //data.shift(); //remove first
+  draw();
+  //console.log("click: "+JSON.stringify(data))
+});
+//socket.on('s2cT',function(temp){
+//  console.log(temp);
+//  mx=temp
+// });
+// socket.on('s2cH',function(humi){
+//  console.log(humi);
+//  my=humi
+// });
+var data=[];
+for(var i=0;i<100;i++){
+  data.push([0,0]);
+}
+
+var width = 1024, height = 720, padding = 100;
+var mychart = d3.select(".chart")
+    .attr("width",width)
+    .attr("height",height)
+var x = d3.scale.linear()
+    .domain([13, 30])
+    .range([0, width]);
+var y = d3.scale.linear()
+    .domain([15, 70])
+    .range([0, height]);
+
+//Create the SVG Viewport
+var svgContainer = d3.select("body").append("svg")
+    .attr("width", 1024)
+    .attr("height", 600);
+ 
+ //Create the Scale we will use for the Axis
+ var axisScale = d3.scale.linear()
+    .domain([10, 30])
+    .range([0, 1024]);
+//Create the Axis
+var xAxis = d3.svg.axis()
+    .scale(axisScale);
+
+
+//Create an SVG group Element for the Axis elements and call the xAxis function
+var xAxisGroup = svgContainer.append("g")
+     .call(xAxis);
+
+
+function draw(){
+  var circles=mychart.selectAll("circle")
+    .data(data)
+  circles
+    .transition().duration(5000)
+    .attr("fill","#f90")
+    .attr("r",10)
+    .attr("fill-opacity", function(d,i) { 
+      return Math.pow(0.95,i); 
+    })
+    .attr("cx", function(d,i) { return x(d[0]); })
+    .attr("cy", function(d,i) { return y(d[1]); })
+  circles.enter().append("circle")
+    .transition()
+    .attr("r",0)
+    .attr("cx", function(d,i) { return x(d[0]); })
+    .attr("cy", function(d,i) { return y(d[1]); })
+    .attr("fill","#aa0")
+    
+  circles.exit().transition().duration(1000)
+    .attr("r",0)
+    .remove();
+
+}
+</script>
+</div>
+
+
 </body>
 </html>

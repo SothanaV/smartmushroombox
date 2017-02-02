@@ -17,6 +17,13 @@
 			<p><font color="Blue"> Blue </font>
 			<input type="range" min="0.00" max="255.00" value="0"  oninput="Blue(this.value)" />
 				<span id="Blue">0</span>
+		<h1><font color="Gray"> Status </font> </h1>
+		<p> Status
+		<a id="status"></a>
+		<p> Cooler 
+		<a id="cooler"></a>
+		<p> Pump 
+		<a id="Pump"></a>
 	<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
 	var socket = io();
@@ -57,13 +64,30 @@
 		var obj = JSON.stringify(newValueTs,newValueHs);
 		socket.emit('c2s',  obj);
 	}
-	function ShowState(Sdata)
-	{
-	socket.on('s2c',ShowState(Sdata))
+	
+	socket.on('s2c', function(Sdata)
 		{
 		console.log(Sdata);
-		};
+		document.getElementById("status").innerHTML=Sdata;
+		});
+	socket.on('s2cC', function(C)
+	{
+		/*if (C==101);
+		{
+			c_data = "ON"
+		}
+		if (C==100);
+		{
+			c_data = "OFF"
+		}
+
+		document.getElementById("cooler").innerHTML=c_data;*/
+		document.getElementById("cooler").innerHTML=C;
+	});
+	socket.on('s2cP', function(P)
+		{
+		document.getElementById("Pump").innerHTML=P;
+		});
 		
-	}
 </script>
 </html>

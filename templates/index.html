@@ -2,6 +2,7 @@
 <html>
   <head>
   	<title>SmartMushroomBox</title>
+    <h1><font color="Red"> SmartMushroomBox </font></h1>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -21,9 +22,9 @@
     <script>
       var socket = io();
       //var socket = io.connect('http://192.168.1.36:5000');
-      socket.on('s2c_targetT', function(msg)
+      socket.on('s2c', function(msg)
       {
-      	console.logT(msg)
+      	console.log(msg)
         $('#mylist').text(msg);
         $('#mylist').append($('<li>').text(msg));
       });

@@ -26,6 +26,7 @@ lastlight=0
 io = StringIO()
 stateT = 0
 stateH = 0
+L_status = "ON"
 #Get data From Browser	
 @socketio.on('c2s')																				#listen Data From Browser parth socketio "c2s" = cilent to server 
 def C2S(data):
@@ -68,26 +69,14 @@ def alarm(t,h):
 	#return "RECIVED"
 	stateT = t
 	stateH = h
-	write_file()
-	writeDB()
+	socketio.emit('s2cS',{'t':t,'h':h})
+	socketio.emit('s2cH',h)
+	socketio.emit('s2cT',t)
+	#writeDB()
 	onoff()
-	socketio.emit('s2c',log)
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
 	
-def write_file():
-	global targetT ,targetH ,StateT ,stateH ,Red ,Green ,Blue
-	print "write_file"
-	with open("DATA.txt", "w+") as file:
-		file.write(str(targetT))
-		file.write(str(targetH))
-		file.write(str(stateT))
-		file.write(str(stateH))
-		file.write(str(Red))
-		file.write(str(Green))
-		file.write(str(Blue))
 
-	with open("DATA.txt", "r") as file:
-		print file.read()
 def SWcontrolT(StateT):
 	global lastSW
 	global lastOffCooler
@@ -95,17 +84,16 @@ def SWcontrolT(StateT):
 	if targetT!='None':
 		if(float (StateT)>float (targetT) and datetime.now()>(lastOffCooler+timedelta(minutes=1))):
 			switchT="101"
+			C_status = "ON"
 			print "OnCooler"
 		else:
 			switchT="100"
+			C_status = "OFF"
 			print "OffCooler"
-	socketio.emit('s2cC',switchT)
+	socketio.emit('s2cC',C_status)
 	if(lastSW=="101" and switchT=="100"):
 		lastOffCooler = datetime.now()
 	lastSW=switchT
-	#print "LastOff: %s"%lastOffCooler
-	#print "DatetimeNow+delta: %s"%(lastOffCooler+timedelta(minutes=1))
-	#print "DatetimeNow: %s"%datetime.now()
 
 	return switchT
 
@@ -116,10 +104,12 @@ def SWcontrolH(StateH):
 		if (float (StateH)<float (targetH)):
 			switchH="201"
 			print "OnPump"
+			P_status = "ON"
 		else:
 			switchH="200"
+			P_status = "OFF"
 			print "OffPump"
-	socketio.emit('s2cP',switchH)		
+	socketio.emit('s2cP',P_status)		
 	return switchH
 def  onoff():
 	print "onOff"
@@ -131,34 +121,35 @@ def  onoff():
 	global lastlighton
 	global lastlightoff
 	global lastlight
-	if( datetime.now()<(lastlighton+timedelta(seconds=10)) and lastlightoff>lastlighton ):
+	global targetT
+	global L_status
+	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
 		Red = 255
 		Green = 0
 		Blue = 255
+		targetT = 20
+		lastlighton = datetime.now()
+		L_status = "ON"
+		print "LIGHTON"
 	else:
 		Red = 0
 		Green = 0
 		Blue = 0
-		lastlightoff = datetime.now()-timedelta(seconds=10)
-	if(lastlight==255 and Red==0):
-		lastlighton = datetime.now()
-		print "UPDATETIMES"
+		L_status = "OFF"
+		targetT = 16
+		#lastlightoff = datetime.now()
+	if (datetime.now()>(lastlighton+timedelta(hours=10))):
+		Red = 0
+		Green = 0
+		Blue = 0
+		targetT = 16
+		L_status = "OFF"
+		print "LIGHTOFF"
+		lastlightoff = datetime.now()
 	lastlight = Red
+	socketio.emit('L_status',L_status)
 	return Red , Green ,Blue
-	
-@app.route("/sliderbarTemp")
-def sliderbarTemp():
-	return render_template('sliderbarTemp.html')
-
-@app.route("/sliderbarHumi")
-def sliderbarHumi():
-	return render_template('sliderbarHumi.html')
-
-@app.route("/sliderbar")
-def  sliderbar():
-	return render_template('sliderbar.html')
-
 @app.route("/naii")
 def naii():
 	return render_template('naii.html')
@@ -166,13 +157,21 @@ def naii():
 def TEST1():
 	return render_template('TEST1.html')
 
+@app.route("/chart")
+def chart():
+	return render_template('chart.html')
+@app.route("/d3")
+def d3():
+	return render_template('d3.html')
 @app.route("/data.json")
 def TEST2():
 	db=sqlite3.connect('mydb.sqlite')
 	cur=db.cursor()
-	x=cur.execute("SELECT * FROM smartmushroom").fetchall()
+	x=cur.execute("SELECT * FROM smartmushroom where id % 200 =0 order by timestamp desc limit 500 ").fetchall()
+	#x=cur.execute("SELECT * FROM smartmushroom ").fetchall()
 	y=x
-	print "y: %s"%y
+	#print "y: %s"%y
+	print "GetData2Json"
 	db.close()
 	data=[]
 	for i in y:
@@ -188,17 +187,19 @@ def TEST2():
 			"Blue":i[8],
 		}
 		data.append(d)
-
 	return jsonify(data)
+
 @app.route("/view")
 def view():
 	return render_template('status.html')
+
 def writeDB():
 	global stateT,stateH,targetT,targetH,Red,Green,Blue
 	db=sqlite3.connect('mydb.sqlite')
 	cur=db.cursor()
 	command="INSERT INTO smartmushroom(stateT,stateH,targetT,targetH,Red,Green,Blue) VALUES (%s,%s,%s,%s,%s,%s,%s);"%(stateT,stateH,targetT,targetH,Red,Green,Blue)
-	print command
+	#print command
+	print "WriteDataBase"
 	x=cur.execute(command)
 	db.commit()
 	x=cur.execute("SELECT * FROM smartmushroom")
