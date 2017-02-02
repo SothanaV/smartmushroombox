@@ -150,9 +150,9 @@ function draw(){
 	circles
 		.transition().duration(1000)
 		.attr("fill","#f90")
-		.attr("r",2)
+		.attr("r",5)
 		.attr("fill-opacity", function(d,i) { 
-			return Math.pow(0.95,i); 
+			return Math.pow(0.99,i); 
 		})
 		.attr("cx", function(d,i) { return x(d[0]); })
 		.attr("cy", function(d,i) { return y(d[1]); })

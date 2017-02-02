@@ -126,7 +126,7 @@ def  onoff():
 	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
 		Red = 255
-		Green = 0
+		Green = 0255
 		Blue = 255
 		targetT = 20
 		lastlighton = datetime.now()
