@@ -59,7 +59,7 @@ def alarm(t,h):
 	global Red
 	global Green
 	global Blue
-	global stateT,stateH 
+	global stateT,stateH, last_writedb 
 	log= str(datetime.now()) + "||Temperature: %s *c Humidity: %s percent"%(t,h)
 	print log
 	#logT = "Temperature: %s"%(t)
@@ -73,7 +73,7 @@ def alarm(t,h):
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
-	if( datetime.now()<(last_writedb+timedelta(seconds=10))):
+	if( (last_writedb+timedelta(seconds=10))<datetime.now()):
 		writeDB()
 		last_writedb=datetime.now()
 	onoff()
