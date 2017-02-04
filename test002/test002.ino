@@ -7,7 +7,7 @@
 //////////Define Pin///////////////////////////////////////////////////////////
 #define USE_SERIAL Serial
 int DHTPIN = 2;          //setpin of DHT at D0
-int DHTTYPE = DHT11;     //set Dht Type 
+int DHTTYPE = DHT22;     //set Dht Type 
 /////////////////-----------------------------------//////////////////////////
 int Cooler = 4;             //setpin of Refrigeratoe at D2
 int Pump = 5;               //setpin of pump to D1
@@ -136,7 +136,7 @@ void SendData(float h,float t)
         }
         http.end();
     }
-    delay(2000);
+    //delay(2000);
 }
 
 ////////////////OnCooler//////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ void SendData(float h,float t)
 void Oncooler()
 {
   digitalWrite(Cooler,HIGH);
-  delay(100);                   //Set Delay for Refrigterator
+  //delay(100);                   //Set Delay for Refrigterator
 }
 
 /////////////////OffCooler//////////////////////////////////////////////////////////////

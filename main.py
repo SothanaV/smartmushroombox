@@ -69,6 +69,7 @@ def alarm(t,h):
 	#return "RECIVED"
 	stateT = t
 	stateH = h
+	socketio.emit('s2c',log)
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
