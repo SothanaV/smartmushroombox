@@ -21,6 +21,7 @@ Blue = 0
 lastOffCooler = datetime.now()
 lastlighton = datetime.now()
 lastlightoff = datetime.now()
+last_writedb=datetime.now()
 lastSW=''
 lastlight=0
 io = StringIO()
@@ -58,7 +59,7 @@ def alarm(t,h):
 	global Red
 	global Green
 	global Blue
-	global stateT,stateH 
+	global stateT,stateH, last_writedb 
 	log= str(datetime.now()) + "||Temperature: %s *c Humidity: %s percent"%(t,h)
 	print log
 	#logT = "Temperature: %s"%(t)
@@ -73,7 +74,9 @@ def alarm(t,h):
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
-	#writeDB()
+	if( (last_writedb+timedelta(seconds=10))<datetime.now()):
+		writeDB()
+		last_writedb=datetime.now()
 	onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
 	
@@ -127,7 +130,7 @@ def  onoff():
 	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
 		Red = 255
-		Green = 0
+		Green = 0255
 		Blue = 255
 		targetT = 20
 		lastlighton = datetime.now()
