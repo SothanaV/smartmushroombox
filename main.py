@@ -28,6 +28,7 @@ io = StringIO()
 stateT = 0
 stateH = 0
 L_status = "ON"
+commandClick = 1
 #Get data From Browser	
 @socketio.on('c2s')																				#listen Data From Browser parth socketio "c2s" = cilent to server 
 def C2S(data):
@@ -46,7 +47,7 @@ def C2S(data):
 	print "TARGET_H : %s"%(targetH)
 	print "Red%03d,Green%03d,Blue%03d"%(Red,Green,Blue)
 
-@app.route("/send")
+@app.route("/adminnaii")
 def GET_DATA():
 	return render_template('send.html')																#Render Slider Bar for Set Temperature amd Humidity
 
@@ -74,13 +75,34 @@ def alarm(t,h):
 	socketio.emit('s2cS',{'t':t,'h':h})
 	socketio.emit('s2cH',h)
 	socketio.emit('s2cT',t)
-	if( (last_writedb+timedelta(seconds=10))<datetime.now()):
-		writeDB()
+	socketio.emit('TaT',targetT)
+	socketio.emit('TaH',targetH)
+	socketio.emit('L_status',L_status)
+	if( (last_writedb+timedelta(seconds=20))<datetime.now()):
+		#writeDB()
 		last_writedb=datetime.now()
-	onoff()
+	#onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
-	
 
+
+@socketio.on('c2sClick')
+def AutoManual(command):
+	global commandClick
+	global L_status
+	commandClick = command
+	if(command==1):
+		onoff()
+		commandClick = 1
+	else:
+		Manual()
+	
+	if(commandClick==2):
+		Manual()
+		commandClick = 2
+		L_status = ""
+	else:
+		onoff()
+	print command
 def SWcontrolT(StateT):
 	global lastSW
 	global lastOffCooler
@@ -115,6 +137,13 @@ def SWcontrolH(StateH):
 			print "OffPump"
 	socketio.emit('s2cP',P_status)		
 	return switchH
+def Manual():
+	global Red
+	global Green
+	global Blue
+	global switchT
+	global switchH
+
 def  onoff():
 	print "onOff"
 	print "last ON%s"%lastlighton
@@ -127,12 +156,15 @@ def  onoff():
 	global lastlight
 	global targetT
 	global L_status
+	global targetH
+	targetH = 60
 	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
-		Red = 255
-		Green = 0255
-		Blue = 255
+		Red = 600
+		Green = 0
+		Blue = 600
 		targetT = 20
+		targetH = 60
 		lastlighton = datetime.now()
 		L_status = "ON"
 		print "LIGHTON"
@@ -142,19 +174,20 @@ def  onoff():
 		Blue = 0
 		L_status = "OFF"
 		targetT = 16
+		targetH = 75
 		#lastlightoff = datetime.now()
 	if (datetime.now()>(lastlighton+timedelta(hours=10))):
 		Red = 0
 		Green = 0
 		Blue = 0
 		targetT = 16
+		targetH = 75
 		L_status = "OFF"
 		print "LIGHTOFF"
 		lastlightoff = datetime.now()
 	lastlight = Red
-	socketio.emit('L_status',L_status)
 	return Red , Green ,Blue
-@app.route("/naii")
+@app.route("/smb")
 def naii():
 	return render_template('naii.html')
 @app.route("/TEST1")
@@ -167,6 +200,9 @@ def chart():
 @app.route("/d3")
 def d3():
 	return render_template('d3.html')
+@app.route("/admin")
+def ad():
+	return render_template('admin.html')
 @app.route("/data.json")
 def TEST2():
 	db=sqlite3.connect('mydb.sqlite')

@@ -1,6 +1,10 @@
 <html>
 	<body>
 		<h1><font color="orange"> SmartMushroomBox </font></h1>
+		<h2> Mode 
+		<button onclick="ClickA()"> Auto </button>
+		<button onclick="ClickM()"> Manual </button>
+		<span id="Click"> </span> 
 		<h1><font color="red"> SET Temperature_:  </font>
 			<input type="range" min="0.00" max="100.00" value="0"  oninput="showValueT(this.value)" />
 				<span id="range">0</span>
@@ -24,12 +28,14 @@
 		<a id="cooler"></a>
 		<p> Pump 
 		<a id="Pump"></a>
+
 	<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
 <script type="text/javascript" charset="utf-8">
 	var socket = io();
 	//var showValueT =();
 	//var showValueH = ();
 	var data={"T": 0, "H": 0, "R": 0, "G": 0, "B": 0}
+	var command = 0;
 	function showValueT(newValueT)
 	{
 		document.getElementById("range").innerHTML=newValueT;
@@ -53,7 +59,8 @@
 		document.getElementById("Green").innerHTML=newValueGreen;
 		data["G"]=newValueGreen;
 		socket.emit('c2s', JSON.stringify(data));
-	}function Blue(newValueBlue)
+	}
+	function Blue(newValueBlue)
 	{
 		document.getElementById("Blue").innerHTML=newValueBlue;
 		data["B"]=newValueBlue;
@@ -88,6 +95,20 @@
 		{
 		document.getElementById("Pump").innerHTML=P;
 		});
+	function ClickA(command)
+	{
+		document.getElementById("Click").innerHTML="Auto";
+		command = 1;
+		socket.emit('c2sClick' ,command);
+		console.log(command)
+	} 
+	function ClickM(command)
+	{
+		document.getElementById("Click").innerHTML="Manual";
+		command = 2;
+		socket.emit('c2sClick' ,command);
+		console.log(command)
+	}
 		
 </script>
 </html>

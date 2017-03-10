@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ControlSMB</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='raphael-min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>ControlSMB</h1>
+  <h2> Mode </h2>
+    <button onclick="ClickA()"> Auto </button>
+    <button onclick="ClickM()"> Manual </button>
+    <span id="Click"> </span>
+    
+</div>
+  
+<div class="container">
+  <div class="row">
+
+    <div  id="Temp" class="col-sm-4">
+      <h1 style="text-align:center;"> SET Temperature&Humidity  </h1>
+      <p><font color="red"> SET Temperature:  </font>
+      <input type="range" min="0.00" max="100.00" value="0"  oninput="showValueT(this.value)" />
+        <span id="range">0</span>
+      <p><font color="blue">Humidity: </font>
+      <input type="range" min="0.00" max="100.00" value="0"  oninput="showValueH(this.value)" />
+        <span id="range2">0</span>
+    </div>
+
+    <div id="Humi" class="col-sm-4">
+    <h1 style="text-align:center;"><font color="black"> SET LightLED </font> </h1>
+      <p><font color="Red"> Red </font>
+      <input type="range" min="0.00" max="999.00" value="0"  oninput="Red(this.value)"   />
+        <span id="Red">0</span>
+      <p><font color="Green"> Green </font>
+      <input type="range" min="0.00" max="999.00" value="0"  oninput="Green(this.value)" />
+        <span id="Green">0</span>
+      <p><font color="Blue"> Blue </font>
+      <input type="range" min="0.00" max="999.00" value="0"  oninput="Blue(this.value)" />
+        <span id="Blue">0</span>
+    </div>
+
+    <div id="Light" class="col-sm-4">
+      <h1><font color="Gray"> Status </font> </h1>
+    <h3> Status
+    <h4> Temperature
+    <a id="SaT"></a>
+    <h4> Humidity
+    <a id="SaH"></a>
+    <p> Cooler 
+    <a id="cooler"></a>
+    <p> Pump 
+    <a id="Pump"></a>
+    <h3> Target </h3>
+    <h4> Temperature 
+    <a id="TaT"> </a>
+    <h4> Humidity 
+    <a id="TaH"> </a>
+    </div>
+
+</div>
+<script type="text/javascript" charset="utf-8">
+  var socket = io();
+  //var showValueT =();
+  //var showValueH = ();
+  var data={"T": 0, "H": 0, "R": 0, "G": 0, "B": 0}
+  var command = 0;
+  function showValueT(newValueT)
+  {
+    document.getElementById("range").innerHTML=newValueT;
+    data["T"]=newValueT;
+    socket.emit('c2s',  JSON.stringify(data));
+  }
+  function showValueH(newValueH)
+  {
+    document.getElementById("range2").innerHTML=newValueH;
+    data["H"]=newValueH;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Red(newValueRed)
+  {
+    document.getElementById("Red").innerHTML=newValueRed;
+    data["R"]=newValueRed;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Green(newValueGreen)
+  {
+    document.getElementById("Green").innerHTML=newValueGreen;
+    data["G"]=newValueGreen;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Blue(newValueBlue)
+  {
+    document.getElementById("Blue").innerHTML=newValueBlue;
+    data["B"]=newValueBlue;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function senddata(newValueT,newValueH)
+  {
+    var obj = JSON.stringify(newValueTs,newValueHs);
+    socket.emit('c2s',  obj);
+  }
+  
+  socket.on('s2cC', function(C)
+  {
+    /*if (C==101);
+    {
+      c_data = "ON"
+    }
+    if (C==100);
+    {
+      c_data = "OFF"
+    }
+
+    document.getElementById("cooler").innerHTML=c_data;*/
+    document.getElementById("cooler").innerHTML=C;
+  });
+  socket.on('s2cP', function(P)
+    {
+    document.getElementById("Pump").innerHTML=P;
+    });
+  function ClickA(command)
+  {
+    document.getElementById("Click").innerHTML="Auto";
+    command = 1;
+    socket.emit('c2sClick' ,command);
+    console.log(command)
+  } 
+  function ClickM(command)
+  {
+    document.getElementById("Click").innerHTML="Manual";
+    command = 2;
+    socket.emit('c2sClick' ,command);
+    console.log(command)
+  }
+  socket.on('TaT', function(TaT)
+    {
+      document.getElementById("TaT").innerHTML=TaT;
+    });
+  socket.on('TaH', function(TaH)
+    {
+      document.getElementById("TaH").innerHTML=TaH;
+    });
+  socket.on('s2cT', function(SaT)
+    {
+      document.getElementById("SaT").innerHTML=SaT;
+    });
+  socket.on('s2cH', function(SaH)
+    {
+      document.getElementById("SaH").innerHTML=SaH;
+    });
+    
+</script>
+
+</body>
+</html>

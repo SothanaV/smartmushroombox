@@ -24,7 +24,7 @@ void OffPump();
 
 const char* ssid     = "linksys_SES_54153";            //Set ssid
 const char* password = "vasabilab";                    //Set Password
-const char* Server   = "10.100.20.195";           //set Server Domain or Server ip
+const char* Server   = "10.100.20.173";           //set Server Domain or Server ip
 DHT dht(DHTPIN, DHTTYPE);                             //Start DHT
 ESP8266WiFiMulti WiFiMulti;
 
@@ -136,7 +136,7 @@ void SendData(float h,float t)
         }
         http.end();
     }
-    //delay(2000);
+    delay(500);
 }
 
 ////////////////OnCooler//////////////////////////////////////////////////////////////
