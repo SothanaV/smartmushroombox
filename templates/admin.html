@@ -11,14 +11,84 @@
 <script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
 <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
 </head>
+<style>
+.switch 
+{
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider 
+{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before 
+{
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider 
+{
+  background-color: #3399ff;
+
+}
+
+input:focus + .slider 
+{
+  box-shadow: 0 0 1px #3399ff;
+
+}
+
+input:checked + .slider:before 
+{
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+  
+}
+
+/* Rounded sliders */
+.slider.round 
+{
+  border-radius: 34px;
+}
+
+.slider.round:before 
+{
+  border-radius: 50%;
+}
+
+</style>
 <body>
 
 <div class="jumbotron text-center">
   <h1>ControlSMB</h1>
   <h2> Mode </h2>
-    <button onclick="ClickA()"> Auto </button>
-    <button onclick="ClickM()"> Manual </button>
-    <span id="Click"> </span>
+  <h4>Auto
+    <label class="switch">
+          <input type="checkbox"  id="M" value="OFF" style="color:blue" onclick="toggle(this);">
+           <div class="slider round" ></div>
     
 </div>
   
@@ -49,20 +119,21 @@
     </div>
 
     <div id="Light" class="col-sm-4">
-      <h1><font color="Gray"> Status </font> </h1>
-    <h3> Status
-    <h4> Temperature
+      <h1 style="text-align:center;"> Status </h1>
+    <h3 style="text-align:center;"> Status
+    <h4> Temperature :
     <a id="SaT"></a>
-    <h4> Humidity
+    <h4> Humidity <font color="white">-----</font>:
     <a id="SaH"></a>
-    <p> Cooler 
+    <h4> Cooler <font color="white">--------</font>:
     <a id="cooler"></a>
-    <p> Pump 
+    <h4> Pump <font color="white">---------</font>:
     <a id="Pump"></a>
-    <h3> Target </h3>
-    <h4> Temperature 
+    
+    <h3 style="text-align:center;"> Target </h3>
+    <h4> Temperature :
     <a id="TaT"> </a>
-    <h4> Humidity 
+    <h4> Humidity <font color="white">-----</font>:
     <a id="TaH"> </a>
     </div>
 
@@ -127,20 +198,6 @@
     {
     document.getElementById("Pump").innerHTML=P;
     });
-  function ClickA(command)
-  {
-    document.getElementById("Click").innerHTML="Auto";
-    command = 1;
-    socket.emit('c2sClick' ,command);
-    console.log(command)
-  } 
-  function ClickM(command)
-  {
-    document.getElementById("Click").innerHTML="Manual";
-    command = 2;
-    socket.emit('c2sClick' ,command);
-    console.log(command)
-  }
   socket.on('TaT', function(TaT)
     {
       document.getElementById("TaT").innerHTML=TaT;
@@ -157,6 +214,23 @@
     {
       document.getElementById("SaH").innerHTML=SaH;
     });
+  function toggle(button)
+{
+  if(document.getElementById("M").value=="OFF")
+  {
+   document.getElementById("M").value="ON";
+   button = 1
+   socket.emit('c2sClick' ,button);
+  }
+
+  else if(document.getElementById("M").value=="ON")
+  {
+   document.getElementById("M").value="OFF";
+   button = 2
+   socket.emit('c2sClick' ,button);
+}
+   console.log(button);
+}
     
 </script>
 

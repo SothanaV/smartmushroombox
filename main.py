@@ -79,7 +79,8 @@ def alarm(t,h):
 	socketio.emit('TaH',targetH)
 	socketio.emit('L_status',L_status)
 	if( (last_writedb+timedelta(seconds=20))<datetime.now()):
-		#writeDB()
+		writeDB()
+		print "writeDB_0"
 		last_writedb=datetime.now()
 	#onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
@@ -93,6 +94,7 @@ def AutoManual(command):
 	if(command==1):
 		onoff()
 		commandClick = 1
+		
 	else:
 		Manual()
 	
@@ -160,9 +162,9 @@ def  onoff():
 	targetH = 60
 	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
-		Red = 600
+		Red = 999
 		Green = 0
-		Blue = 600
+		Blue = 999
 		targetT = 20
 		targetH = 60
 		lastlighton = datetime.now()
