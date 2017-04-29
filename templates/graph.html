@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>SmartMushroomBox</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='raphael-min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='morris-0.4.1.min.js') }}"></script>
+</head>
+<body>
+</div>
+      <div class="col-sm4">
+          <h2 style="text-align:center";><font color="black"> GRAPH </font></h2>
+          <h5 style="text-align:center";> กราฟ </h5>
+          <div id="graph" style="text-align:center";></div>
+            <script type="text/javascript">
+                 $.getJSON( "data.json", function( data ) 
+                 {
+                  data.forEach( function(element,i,delta)
+                  {
+                    data[i].Red=data[i].Red/32;
+                    
+                  });
+                  Morris.Line({
+                  element: 'graph',
+                  data: data,
+                  xkey: 'timestamp',
+                  ykeys: ['stateT', 'stateH','targetT','Red'],
+                  labels: ['Temperature', 'Humidity','TargetTemperature','Light'],
+                  pointSize: 0,
+                  lineWidth: 1.5
+                });
+                });         
+            </script>
+      </div>
+</div>
+
+
+</body>
+</html>

@@ -205,6 +205,9 @@ def d3():
 @app.route("/admin")
 def ad():
 	return render_template('admin.html')
+@app.route("/graph")
+def gra():
+	return render_template('graph.html')
 @app.route("/data.json")
 def TEST2():
 	db=sqlite3.connect('mydb.sqlite')
