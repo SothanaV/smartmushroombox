@@ -79,7 +79,7 @@ def alarm(t,h):
 	socketio.emit('TaH',targetH)
 	socketio.emit('L_status',L_status)
 	if( (last_writedb+timedelta(seconds=20))<datetime.now()):
-		writeDB()
+		#writeDB()
 		print "writeDB_0"
 		last_writedb=datetime.now()
 	#onoff()
@@ -240,6 +240,9 @@ def TEST2():
 @app.route("/view")
 def view():
 	return render_template('status.html')
+@app.route("/data/20.00/65.00")
+def view():
+	return render_template('data.html')
 
 def writeDB():
 	global stateT,stateH,targetT,targetH,Red,Green,Blue
