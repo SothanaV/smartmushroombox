@@ -15,7 +15,7 @@
 
 <div class="jumbotron text-center">
   <h1>SmartMushroomBox</h1>
-  <h3><font color="#6b6a6a"> กล่องเห็ดอัจฉริยะ </font></h3> 
+  <h2><font color="#6b6a6a"> กล่องเห็ดอัจฉริยะ </font></h2> 
 </div>
   
 <div class="container">
@@ -46,6 +46,7 @@
               pointSize: 0,
               ymin: 14,
               ymax: 23,
+              lineWidth: 1.5
               });
               });
 
@@ -89,7 +90,8 @@
               ykeys: ['stateH'],
               pointSize: 0,
               ymin: 15,
-              ymax: 65
+              ymax: 65,
+                  lineWidth: 1
               });
               });
               $(document).ready(function()
@@ -132,7 +134,8 @@
                 data: data,
                 xkey: 'timestamp',
                 ykeys: ['Red'],
-                pointSize: 0
+                pointSize: 0,
+                  lineWidth: 1.5
                 });
                 });
           $(document).ready(function()
@@ -170,7 +173,8 @@
                   xkey: 'timestamp',
                   ykeys: ['stateT', 'stateH','targetT','Red'],
                   labels: ['Temperature', 'Humidity','TargetTemperature','Light'],
-                  pointSize: 0
+                  pointSize: 0,
+                  lineWidth: 2
                 });
                 });         
             </script>

@@ -205,6 +205,9 @@ def d3():
 @app.route("/admin")
 def ad():
 	return render_template('admin.html')
+@app.route("/admintor")
+def adTo():
+	return render_template('torkla.html')
 @app.route("/graph")
 def gra():
 	return render_template('graph.html')
