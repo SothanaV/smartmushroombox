@@ -24,7 +24,7 @@ void OffPump();
 
 const char* ssid     = "SmartMushroomBox";            //Set ssid
 const char* password = "12345678";                    //Set Password
-const char* Server   = "192.168.0.102";           //set Server Domain or Server ip
+const char* Server   = "139.59.99.17";           //set Server Domain or Server ip
 DHT dht(DHTPIN, DHTTYPE);                             //Start DHT
 ESP8266WiFiMulti WiFiMulti;
 
@@ -136,7 +136,7 @@ void SendData(float h,float t)
         }
         http.end();
     }
-    delay(50);
+    delay(500);
 }
 
 ////////////////OnCooler//////////////////////////////////////////////////////////////

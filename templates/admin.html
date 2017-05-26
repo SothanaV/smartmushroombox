@@ -3,13 +3,21 @@
 <head>
   <title>ControlSMB</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5">
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
   <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
   <script src="{{ url_for('static', filename='raphael-min.js') }}"></script>
 <script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
 <script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='syntax.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='epoch.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+<script src="{{ url_for('static', filename='d3.js') }}"></script>
+<script src="{{ url_for('static', filename='epoch.js') }}"></script>
+<script src="{{ url_for('static', filename='data.js') }}"></script>
+<script src="{{ url_for('static', filename='ZeroClipboard.min.js') }}"></script>
+<script src="{{ url_for('static', filename='moment.js') }}"></script>
 </head>
 <style>
 .switch 
@@ -95,7 +103,7 @@ input:checked + .slider:before
 <div class="container">
   <div class="row">
 
-    <div  id="Temp" class="col-sm-4">
+    <div  id="Temp" class="col-sm-6">
       <h1 style="text-align:center;"> SET Temperature&Humidity  </h1>
       <p><font color="red"> SET Temperature:  </font>
       <input type="range" min="0.00" max="100.00" value="0"  oninput="showValueT(this.value)" />
@@ -105,7 +113,7 @@ input:checked + .slider:before
         <span id="range2">0</span>
     </div>
 
-    <div id="Humi" class="col-sm-4">
+    <div id="Humi" class="col-sm-6">
     <h1 style="text-align:center;"><font color="black"> SET LightLED </font> </h1>
       <p><font color="Red"> Red </font>
       <input type="range" min="0.00" max="999.00" value="0"  oninput="Red(this.value)"   />
@@ -118,7 +126,7 @@ input:checked + .slider:before
         <span id="Blue">0</span>
     </div>
 
-    <div id="Light" class="col-sm-4">
+    <div id="Light" class="col-sm-6">
       <h1 style="text-align:center;"> Status </h1>
     <h3 style="text-align:center;"> Status
     <h4> Temperature :
@@ -137,6 +145,12 @@ input:checked + .slider:before
     <a id="TaH"> </a>
     </div>
 
+    <div class="col-sm-6" id="ShowrealtimeGraph">
+      <p></p>
+      <p></p>
+      <h2 style="text-align:center;"> RealTimeGraph</h2>
+      <div id="real-time-line"  class="epoch" style="height: 400px; position: relative;" data-epoch-container-id="epoch-container-3">
+    </div>
 </div>
 <script type="text/javascript" charset="utf-8">
   var socket = io();
@@ -231,6 +245,45 @@ input:checked + .slider:before
 }
    console.log(button);
 }
+  var temp=25;
+    var humi=50;
+    $(function() {
+        var data = new RealTimeData(2);
+
+        var chart = $('#real-time-line').epoch({
+            type: 'time.line',
+            data: data.history(),
+            range: {
+          left: [0,100],
+          right: [0,100]
+        },
+            axes: ['left', 'bottom', 'right']
+        });
+
+        setInterval(function() { 
+          unow=moment().unix();
+          d=data.next();
+          
+          d[0].time=unow;
+          d[0].y=temp;
+          d[1].time=unow;
+          d[1].y=humi;
+          chart.push(d);
+        console.log(unow);
+          console.log(JSON.stringify(d));
+        }, 1000);
+        chart.push(data.next());
+    });
+
+    
+    socket.on('s2cT', function(showtemp)
+      {
+        temp=parseFloat(showtemp);
+      });
+      socket.on('s2cH', function(showhumi)
+      {
+        humi=parseFloat(showhumi);
+      });
     
 </script>
 

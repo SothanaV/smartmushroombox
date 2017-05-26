@@ -240,9 +240,9 @@ def TEST2():
 @app.route("/view")
 def view():
 	return render_template('status.html')
-@app.route("/data/20.00/65.00")
-def view():
-	return render_template('data.html')
+#@app.route("/data/20.00/65.00")
+#def view():
+#	return render_template('data.html')
 
 def writeDB():
 	global stateT,stateH,targetT,targetH,Red,Green,Blue
