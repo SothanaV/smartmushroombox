@@ -194,6 +194,7 @@ input:checked + .slider:before
 
     <div  id="Temp" class="col-sm-6">
       <h1 style="text-align:center;"> SET Temperature&Humidity  </h1>
+      <p></p>
       <p><font color="red"> SET Temperature:  </font>
       <input type="range" min="-20.0" max="30.0" value="0"  oninput="showValueT(this.value)" />
         <span id="range">0</span>
@@ -208,17 +209,12 @@ input:checked + .slider:before
     <a id="SaH"></a>
     <h4> Cooler <font color="white">--------</font>:
     <a id="cooler"></a>
-    <h4> Pump <font color="white">---------</font>:
-    <a id="Pump"></a>
-    
     <h3 style="text-align:center;"> Target </h3>
     <h4> Temperature :
     <a id="TaT"> </a>
-    <h4> Humidity <font color="white">-----</font>:
-    <a id="TaH"> </a>
     </div>
 
-    <div class="col-sm-6" id="ShowrealtimeGraph">
+    <div class="col-sm-12" id="ShowrealtimeGraph">
       <p></p>
       <p></p>
       <h2 style="text-align:center;"> RealTimeGraph</h2>
