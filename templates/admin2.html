@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ControlSMB</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5">
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='raphael-min.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery-1.8.2.min.js') }}"></script>
+<script src="{{ url_for('static', filename='socket.io-1.2.0.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='syntax.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='epoch.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+<script src="{{ url_for('static', filename='d3.js') }}"></script>
+<script src="{{ url_for('static', filename='epoch.js') }}"></script>
+<script src="{{ url_for('static', filename='data.js') }}"></script>
+<script src="{{ url_for('static', filename='ZeroClipboard.min.js') }}"></script>
+<script src="{{ url_for('static', filename='moment.js') }}"></script>
+</head>
+
+<style>
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 6.1px 0;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 17.8px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #bebfbf;
+  border-radius: 10.4px;
+  border: 0.5px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 0.5px solid #000000;
+  height: 30px;
+  width: 30px;
+  border-radius: 50px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -6.6px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #bebfbf;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 17.8px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #bebfbf;
+  border-radius: 10.4px;
+  border: 0.5px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 0.5px solid #000000;
+  height: 30px;
+  width: 30px;
+  border-radius: 50px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 17.8px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #bebfbf;
+  border: 0.5px solid #010101;
+  border-radius: 20.8px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #bebfbf;
+  border: 0.5px solid #010101;
+  border-radius: 20.8px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 0.5px solid #000000;
+  height: 30px;
+  width: 30px;
+  border-radius: 50px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 17.8px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #bebfbf;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #bebfbf;
+}
+
+
+.switch 
+{
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider 
+{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before 
+{
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider 
+{
+  background-color: #3399ff;
+
+}
+
+input:focus + .slider 
+{
+  box-shadow: 0 0 1px #3399ff;
+
+}
+
+input:checked + .slider:before 
+{
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+  
+}
+
+/* Rounded sliders */
+.slider.round 
+{
+  border-radius: 34px;
+}
+
+.slider.round:before 
+{
+  border-radius: 50%;
+}
+
+</style>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>ControlSMB</h1>
+  <h2> Mode </h2>
+  <h4>Auto
+    <label class="switch">
+          <input type="checkbox"  id="M" value="OFF" style="color:blue" onclick="toggle(this);">
+           <div class="slider round" ></div>
+    
+</div>
+  
+<div class="container">
+  <div class="row">
+
+    <div  id="Temp" class="col-sm-6">
+      <h1 style="text-align:center;"> SET Temperature&Humidity  </h1>
+      <p><font color="red"> SET Temperature:  </font>
+      <input type="range" min="-20.0" max="30.0" value="0"  oninput="showValueT(this.value)" />
+        <span id="range">0</span>
+    </div>
+
+    <div id="Light" class="col-sm-6">
+      <h1 style="text-align:center;"> Status </h1>
+    <h3 style="text-align:center;"> Status
+    <h4> Temperature :
+    <a id="SaT"></a>
+    <h4> Humidity <font color="white">-----</font>:
+    <a id="SaH"></a>
+    <h4> Cooler <font color="white">--------</font>:
+    <a id="cooler"></a>
+    <h4> Pump <font color="white">---------</font>:
+    <a id="Pump"></a>
+    
+    <h3 style="text-align:center;"> Target </h3>
+    <h4> Temperature :
+    <a id="TaT"> </a>
+    <h4> Humidity <font color="white">-----</font>:
+    <a id="TaH"> </a>
+    </div>
+
+    <div class="col-sm-6" id="ShowrealtimeGraph">
+      <p></p>
+      <p></p>
+      <h2 style="text-align:center;"> RealTimeGraph</h2>
+      <div id="real-time-line"  class="epoch" style="height: 400px; position: relative;" data-epoch-container-id="epoch-container-3">
+    </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+  var socket = io();
+  //var showValueT =();
+  //var showValueH = ();
+  var data={"T": 0, "H": 0, "R": 0, "G": 0, "B": 0}
+  var command = 0;
+  function showValueT(newValueT)
+  {
+    document.getElementById("range").innerHTML=newValueT;
+    data["T"]=newValueT;
+    socket.emit('c2s',  JSON.stringify(data));
+  }
+  function showValueH(newValueH)
+  {
+    document.getElementById("range2").innerHTML=newValueH;
+    data["H"]=newValueH;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Red(newValueRed)
+  {
+    document.getElementById("Red").innerHTML=newValueRed;
+    data["R"]=newValueRed;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Green(newValueGreen)
+  {
+    document.getElementById("Green").innerHTML=newValueGreen;
+    data["G"]=newValueGreen;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function Blue(newValueBlue)
+  {
+    document.getElementById("Blue").innerHTML=newValueBlue;
+    data["B"]=newValueBlue;
+    socket.emit('c2s', JSON.stringify(data));
+  }
+  function senddata(newValueT,newValueH)
+  {
+    var obj = JSON.stringify(newValueTs,newValueHs);
+    socket.emit('c2s',  obj);
+  }
+  
+  socket.on('s2cC', function(C)
+  {
+    /*if (C==101);
+    {
+      c_data = "ON"
+    }
+    if (C==100);
+    {
+      c_data = "OFF"
+    }
+
+    document.getElementById("cooler").innerHTML=c_data;*/
+    document.getElementById("cooler").innerHTML=C;
+  });
+  socket.on('s2cP', function(P)
+    {
+    document.getElementById("Pump").innerHTML=P;
+    });
+  socket.on('TaT', function(TaT)
+    {
+      document.getElementById("TaT").innerHTML=TaT+'&#8451';
+    });
+  socket.on('TaH', function(TaH)
+    {
+      document.getElementById("TaH").innerHTML=TaH+"%";
+    });
+  socket.on('s2cT', function(SaT)
+    {
+      document.getElementById("SaT").innerHTML=SaT+'&#8451';
+    });
+  socket.on('s2cH', function(SaH)
+    {
+      document.getElementById("SaH").innerHTML=SaH+"%";
+    });
+  function toggle(button)
+{
+  if(document.getElementById("M").value=="OFF")
+  {
+   document.getElementById("M").value="ON";
+   button = 1
+   socket.emit('c2sClick' ,button);
+  }
+
+  else if(document.getElementById("M").value=="ON")
+  {
+   document.getElementById("M").value="OFF";
+   button = 2
+   socket.emit('c2sClick' ,button);
+}
+   console.log(button);
+}
+  var temp=25;
+    var humi=50;
+    $(function() {
+        var data = new RealTimeData(2);
+
+        var chart = $('#real-time-line').epoch({
+            type: 'time.line',
+            data: data.history(),
+            range: {
+          left: [0,100],
+          right: [0,100]
+        },
+            axes: ['left', 'bottom', 'right']
+        });
+
+        setInterval(function() { 
+          unow=moment().unix();
+          d=data.next();
+          
+          d[0].time=unow;
+          d[0].y=temp;
+          d[1].time=unow;
+          d[1].y=humi;
+          chart.push(d);
+        console.log(unow);
+          console.log(JSON.stringify(d));
+        }, 1000);
+        chart.push(data.next());
+    });
+
+    
+    socket.on('s2cT', function(showtemp)
+      {
+        temp=parseFloat(showtemp);
+      });
+      socket.on('s2cH', function(showhumi)
+      {
+        humi=parseFloat(showhumi);
+      });
+    
+</script>
+
+</body>
+</html>

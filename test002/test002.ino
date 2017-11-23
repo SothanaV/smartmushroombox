@@ -22,7 +22,7 @@ void OnPump();
 void OffPump();
 ////////////Setup//////////////////////////////////////////////////////////////
 
-const char* ssid     = "SmartMushroomBox";            //Set ssid
+const char* ssid     = "iot2";            //Set ssid
 const char* password = "12345678";                    //Set Password
 const char* Server   = "139.59.99.17";           //set Server Domain or Server ip
 DHT dht(DHTPIN, DHTTYPE);                             //Start DHT
@@ -84,7 +84,7 @@ void SendData(float h,float t)
     if((WiFiMulti.run() == WL_CONNECTED)) 
     {
         HTTPClient http;
-        String str = "http://" +String(Server)+":5000" +"/data/" + String(t)+"/"+String(h);
+        String str = "http://" +String(Server)+":5555" +"/data/" + String(t)+"/"+String(h);
         Serial.println(str);
         http.begin(str);
         int httpCode = http.GET();

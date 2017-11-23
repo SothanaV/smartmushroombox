@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, send, emit
 from datetime import datetime,timedelta
 import json
-from StringIO import StringIO
+#from StringIO import StringIO
+from io import StringIO
 import sqlite3
 ##Target is Data from Browser to set Humidity,Temperature 
 ##State  is Data From Client(Wemos) to get Humidity,Temperature
@@ -43,9 +44,9 @@ def C2S(data):
 	Red = float(sdata['R'])
 	Green = float(sdata['G'])
 	Blue = float(sdata['B'])
-	print "TARGET_T : %s"%(targetT)																#print data
-	print "TARGET_H : %s"%(targetH)
-	print "Red%03d,Green%03d,Blue%03d"%(Red,Green,Blue)
+	print ("TARGET_T : %s"%(targetT))																#print data
+	print ("TARGET_H : %s"%(targetH))
+	print ("Red%03d,Green%03d,Blue%03d"%(Red,Green,Blue))
 
 @app.route("/adminnaii")
 def GET_DATA():
@@ -62,7 +63,7 @@ def alarm(t,h):
 	global Blue
 	global stateT,stateH, last_writedb 
 	log= str(datetime.now()) + "||Temperature: %s *c Humidity: %s percent"%(t,h)
-	print log
+	print (log)
 	#logT = "Temperature: %s"%(t)
 	#logH = "Humidity   : %s"%(h)
 	#print logH
@@ -80,7 +81,7 @@ def alarm(t,h):
 	socketio.emit('L_status',L_status)
 	if( (last_writedb+timedelta(seconds=20))<datetime.now()):
 		#writeDB()
-		print "writeDB_0"
+		print ("writeDB_0")
 		last_writedb=datetime.now()
 	#onoff()
 	return "%s,%s,%03d,%03d,%03d"%(SWcontrolT(t),SWcontrolH(h),Red,Green,Blue)
@@ -104,20 +105,20 @@ def AutoManual(command):
 		L_status = ""
 	else:
 		onoff()
-	print command
+	print (command)
 def SWcontrolT(StateT):
 	global lastSW
 	global lastOffCooler
-	print "stateT: %s, targetT:%s"%(StateT,targetT)
+	print ("stateT: %s, targetT:%s"%(StateT,targetT))
 	if targetT!='None':
 		if(float (StateT)>float (targetT) and datetime.now()>(lastOffCooler+timedelta(minutes=1))):
 			switchT="101"
 			C_status = "ON"
-			print "OnCooler"
+			print ("OnCooler")
 		else:
 			switchT="100"
 			C_status = "OFF"
-			print "OffCooler"
+			print ("OffCooler")
 	socketio.emit('s2cC',C_status)
 	if(lastSW=="101" and switchT=="100"):
 		lastOffCooler = datetime.now()
@@ -127,16 +128,16 @@ def SWcontrolT(StateT):
 
 def SWcontrolH(StateH):
 	global targetT ,targetH ,StateT ,stateH ,Red ,Green ,Blue
-	print "stateH: %s, targetH:%s"%(StateH,targetH)
+	print ("stateH: %s, targetH:%s"%(StateH,targetH))
 	if targetH !='None':
 		if (float (StateH)<float (targetH)):
 			switchH="201"
-			print "OnPump"
+			print ("OnPump")
 			P_status = "ON"
 		else:
 			switchH="200"
 			P_status = "OFF"
-			print "OffPump"
+			print ("OffPump")
 	socketio.emit('s2cP',P_status)		
 	return switchH
 def Manual():
@@ -147,9 +148,7 @@ def Manual():
 	global switchH
 
 def  onoff():
-	print "onOff"
-	print "last ON%s"%lastlighton
-	print "last OFF%s"%lastlightoff
+	
 	global Red
 	global Green
 	global Blue
@@ -159,6 +158,9 @@ def  onoff():
 	global targetT
 	global L_status
 	global targetH
+	print ("onOff")
+	print ("last ON%s"%lastlighton)
+	print ("last OFF%s"%lastlightoff)
 	targetH = 60
 	if( datetime.now()<(lastlightoff+timedelta(hours=14))):
 	#if( datetime.now()<(lastlighton+timedelta(seconds=10))):
@@ -169,7 +171,7 @@ def  onoff():
 		targetH = 60
 		lastlighton = datetime.now()
 		L_status = "ON"
-		print "LIGHTON"
+		print ("LIGHTON")
 	else:
 		Red = 0
 		Green = 0
@@ -185,7 +187,7 @@ def  onoff():
 		targetT = 16
 		targetH = 75
 		L_status = "OFF"
-		print "LIGHTOFF"
+		print ("LIGHTOFF")
 		lastlightoff = datetime.now()
 	lastlight = Red
 	return Red , Green ,Blue
@@ -204,7 +206,7 @@ def d3():
 	return render_template('d3.html')
 @app.route("/admin")
 def ad():
-	return render_template('admin.html')
+	return render_template('admin2.html')
 @app.route("/admintor")
 def adTo():
 	return render_template('torkla.html')
@@ -219,7 +221,7 @@ def TEST2():
 	#x=cur.execute("SELECT * FROM smartmushroom ").fetchall()
 	y=x
 	#print "y: %s"%y
-	print "GetData2Json"
+	print ("GetData2Json")
 	db.close()
 	data=[]
 	for i in y:
@@ -250,7 +252,7 @@ def writeDB():
 	cur=db.cursor()
 	command="INSERT INTO smartmushroom(stateT,stateH,targetT,targetH,Red,Green,Blue) VALUES (%s,%s,%s,%s,%s,%s,%s);"%(stateT,stateH,targetT,targetH,Red,Green,Blue)
 	#print command
-	print "WriteDataBase"
+	print ("WriteDataBase")
 	x=cur.execute(command)
 	db.commit()
 	x=cur.execute("SELECT * FROM smartmushroom")
