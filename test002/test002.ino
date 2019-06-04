@@ -22,9 +22,9 @@ void OnPump();
 void OffPump();
 ////////////Setup//////////////////////////////////////////////////////////////
 
-const char* ssid     = "iot2";            //Set ssid
-const char* password = "12345678";                    //Set Password
-const char* Server   = "139.59.99.17";           //set Server Domain or Server ip
+const char* ssid     = "ois";            //Set ssid
+const char* password = "ilovestudy";                    //Set Password
+const char* Server   = "smartmushroombox.com";           //set Server Domain or Server ip
 DHT dht(DHTPIN, DHTTYPE);                             //Start DHT
 ESP8266WiFiMulti WiFiMulti;
 
@@ -57,10 +57,10 @@ void setup()
 
 void loop() 
 {
-   float h = dht.readHumidity();      //Read Humidity
-   float t = dht.readTemperature();   //Read Temperature
-   //float t = 25;                                                  ////<<<<<<TEST VALUE
-   //float h = 50;                                                  ////<<<<<<TEST VALUE
+//   float h = dht.readHumidity();      //Read Humidity
+//   float t = dht.readTemperature();   //Read Temperature
+   float t = 25;                                                  ////<<<<<<TEST VALUE
+   float h = 50;                                                  ////<<<<<<TEST VALUE
    Serial.print("TEMPERATURE");
    Serial.println(t);
    Serial.print("HUMIDITY");
@@ -84,7 +84,7 @@ void SendData(float h,float t)
     if((WiFiMulti.run() == WL_CONNECTED)) 
     {
         HTTPClient http;
-        String str = "http://" +String(Server)+":5555" +"/data/" + String(t)+"/"+String(h);
+        String str = "http://" +String(Server)+":5000" +"/data/" + String(t)+"/"+String(h);
         Serial.println(str);
         http.begin(str);
         int httpCode = http.GET();
@@ -104,7 +104,7 @@ void SendData(float h,float t)
                 int v_green = Green.toInt();
                 int v_blue = Blue.toInt();
                 Serial.println("Value Led Red");
-                Serial.println(v_red);
+                Serial.println(999-v_red);
                   if(payload.substring(0,3)=="101")
                     {
                      //OnCooler;
@@ -129,14 +129,14 @@ void SendData(float h,float t)
                       digitalWrite(Pump,LOW);
                       Serial.println("OffPump");
                     }
-                  analogWrite(Led_Red,v_red);
-                  analogWrite(Led_Green,v_green);
-                  analogWrite(Led_Blue,v_blue);
+                  analogWrite(Led_Red,(999-v_red));
+                  analogWrite(Led_Green,(999-v_green));
+                  analogWrite(Led_Blue,(999-v_blue));
               }
         }
         http.end();
     }
-    delay(500);
+    delay(2500);
 }
 
 ////////////////OnCooler//////////////////////////////////////////////////////////////
